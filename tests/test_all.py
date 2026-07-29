@@ -6,6 +6,7 @@ Executes unit tests across all domain services, ORM repositories, exporters, and
 import pytest
 import os
 import tempfile
+import uuid
 from datetime import date
 
 from src.services.cbm_calculator import CBMCalculator
@@ -161,14 +162,16 @@ def test_master_data_repository_crud():
     session = SessionLocal()
     repo = MasterDataRepository(session)
 
+    uid = uuid.uuid4().hex[:6]
+
     # Company Test
     c_data = {
-        "egyptian_importer_name": "شركة النيل للاستيراد والتصدير السريع",
-        "importer_id": "IMP-ALL-9999",
+        "egyptian_importer_name": f"شركة النيل للاستيراد والتصدير {uid}",
+        "importer_id": f"IMP-{uid}",
         "importer_id_expiration_date": today,
-        "vat_id": "999-888-7779",
+        "vat_id": f"VAT-{uid}",
         "vat_id_expiration_date": today,
-        "commercial_registration_no": "REG-123459",
+        "commercial_registration_no": f"REG-{uid}",
         "commercial_registration_expiration": today,
         "address": "القاهرة - مصر",
         "country": "مصر - Egypt"
@@ -178,9 +181,9 @@ def test_master_data_repository_crud():
 
     # Supplier Test
     s_data = {
-        "vendor_company_name": "Shenzhen Electric All Test Ltd 999",
+        "vendor_company_name": f"Shenzhen Electric Ltd {uid}",
         "registration_type": "Company",
-        "foreign_exporter_id": "EXP-ALL-9999",
+        "foreign_exporter_id": f"EXP-{uid}",
         "foreign_exporter_country": "China",
         "foreign_exporter_country_code": "CN",
         "phone_number": "+86 755 8899 0000",
