@@ -1,5 +1,6 @@
 """
 PyInstaller Build Script — Compiles the Enterprise Import System into a standalone Windows .exe with custom branding logo icon.
+Works both locally and in CI/CD environments (GitHub Actions).
 """
 
 import subprocess
@@ -8,7 +9,9 @@ import os
 
 def build():
     print("Starting PyInstaller Build Process...")
-    icon_arg = ["--icon=src/assets/app_icon.ico"] if os.path.exists("src/assets/app_icon.ico") else []
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    icon_path = os.path.join(base_dir, "src", "assets", "app_icon.ico")
+    icon_arg = [f"--icon={icon_path}"] if os.path.exists(icon_path) else []
     
     cmd = [
         sys.executable, "-m", "PyInstaller",
@@ -29,12 +32,13 @@ def build():
     ]
     
     print("Executing build command:", " ".join(cmd))
-    res = subprocess.run(cmd, cwd="i:/disktop")
+    res = subprocess.run(cmd, cwd=base_dir)
     if res.returncode == 0:
         print("\nBUILD SUCCESSFUL!")
-        print(r"The compiled executable with custom logo is located at: i:\disktop\dist\ImportManagementSystem\ImportManagementSystem.exe")
+        print(f"The compiled executable is located at: {os.path.join(base_dir, 'dist', 'ImportManagementSystem', 'ImportManagementSystem.exe')}")
     else:
         print("\nBuild failed with return code:", res.returncode)
+        sys.exit(res.returncode)
 
 if __name__ == "__main__":
     build()
