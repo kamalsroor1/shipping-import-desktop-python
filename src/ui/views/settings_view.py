@@ -146,7 +146,7 @@ class SettingsView(QWidget):
 
         ver = data.get("latest_version", "1.0.1")
         notes = data.get("release_notes_ar" if i18n.current_lang == "ar" else "release_notes_en", "تحديث جديد متوفر.")
-        url = data.get("download_url", "https://shipping.baraa-solutions.com/updates/ImportManagementSystem.exe")
+        url = data.get("download_url", "https://shipping.baraa-solutions.com/updates/ims.exe")
 
         msg = (
             f"🎉 يتوفر إصدار جديد من النظام: v{ver}\n\n"

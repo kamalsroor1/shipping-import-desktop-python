@@ -1,7 +1,7 @@
 {
   "latest_version": "1.0.1",
   "release_date": "2026-08-01",
-  "download_url": "https://shipping.baraa-solutions.com/updates/ImportManagementSystem.exe",
+  "download_url": "https://shipping.baraa-solutions.com/updates/ims.exe",
   "mandatory": false,
   "release_notes_ar": "تحديث جديد يتضمن تحسين حاسبة الجمارك، دعم مصفوفة Incoterms 2020، وسرعة استعلام نافذة.",
   "release_notes_en": "New update featuring customs calculator improvements, Incoterms 2020 matrix support, and performance fixes."

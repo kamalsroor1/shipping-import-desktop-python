@@ -1,5 +1,5 @@
 """
-PyInstaller Build Script — Compiles the Enterprise Import System into a SINGLE Standalone Windows .exe (--onefile).
+PyInstaller Build Script — Compiles the Enterprise Import System into a SINGLE Standalone Windows .exe named ims.exe.
 Works both locally and in CI/CD environments (GitHub Actions).
 """
 
@@ -8,14 +8,14 @@ import sys
 import os
 
 def build():
-    print("Starting PyInstaller Single-File Build Process...")
+    print("Starting PyInstaller Single-File Build Process for ims.exe...")
     base_dir = os.path.dirname(os.path.abspath(__file__))
     icon_path = os.path.join(base_dir, "src", "assets", "app_icon.ico")
     icon_arg = [f"--icon={icon_path}"] if os.path.exists(icon_path) else []
     
     cmd = [
         sys.executable, "-m", "PyInstaller",
-        "--name=ImportManagementSystem",
+        "--name=ims",
         "--onefile",
         "--windowed",
         "--noconfirm",
@@ -36,7 +36,7 @@ def build():
     res = subprocess.run(cmd, cwd=base_dir)
     if res.returncode == 0:
         print("\nSINGLE-FILE BUILD SUCCESSFUL!")
-        print(f"The standalone executable is located at: {os.path.join(base_dir, 'dist', 'ImportManagementSystem.exe')}")
+        print(f"The standalone executable is located at: {os.path.join(base_dir, 'dist', 'ims.exe')}")
     else:
         print("\nBuild failed with return code:", res.returncode)
         sys.exit(res.returncode)

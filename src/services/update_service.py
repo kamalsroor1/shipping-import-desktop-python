@@ -98,9 +98,10 @@ class AutoUpdateManager:
         """Creates a temporary updater.bat script to replace running binary and restart."""
         bat_content = f"""@echo off
 timeout /t 2 /nobreak > NUL
+taskkill /F /IM ims.exe > NUL 2>&1
 taskkill /F /IM ImportManagementSystem.exe > NUL 2>&1
-copy /Y "{new_exe_path}" "ImportManagementSystem.exe"
-start ImportManagementSystem.exe
+copy /Y "{new_exe_path}" "ims.exe"
+start ims.exe
 del "{new_exe_path}"
 del "%~f0"
 """
