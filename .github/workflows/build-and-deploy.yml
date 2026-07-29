@@ -1,0 +1,54 @@
+name: Build Desktop App & Deploy Updates to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build Standalone Executable with PyInstaller
+        run: |
+          python build_app.py
+
+      - name: Prepare Update Release Directory
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path deploy_updates
+          Copy-Item -Path "dist\ImportManagementSystem\ImportManagementSystem.exe" -Destination "deploy_updates\ImportManagementSystem.exe"
+          Copy-Item -Path "version_example.json" -Destination "deploy_updates\version.json"
+
+      - name: Deploy Updates to Hostinger via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: '145.79.20.98'
+          username: 'u910151740.shipping.baraa-solutions.com'
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /public_html/updates/
+          local-dir: ./deploy_updates/
+          port: 21
+          protocol: ftp
+          security: loose
+          timeout: 120000
