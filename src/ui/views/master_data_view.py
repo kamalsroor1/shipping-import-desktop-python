@@ -1,6 +1,6 @@
 """
 Master Data View — DESIGN_RULES.md Compliant & Pure i18n
-Complete Coverage for MD-001 through MD-008 Master Data Management
+Complete Coverage for MD-001 through MD-010 Master Data Management
 Real Database Integration & Interactive Form Dialogs
 """
 
@@ -21,6 +21,8 @@ from src.database.models import (
     Company, Supplier, ServiceProvider, ShippingLine,
     Currency, Incoterm, Project
 )
+from src.database.models.customs_tariff import CustomsTariff
+from src.database.models.container_spec import ContainerSpec
 
 from src.ui.forms.new_company_form import NewCompanyForm
 from src.ui.forms.new_supplier_form import NewSupplierForm
@@ -59,19 +61,27 @@ class MasterDataView(QWidget):
         self.tab_providers = self._build_providers_tab()
         self.tabs.addTab(self.tab_providers, "🤝  شركاء الخدمات والملاحة (MD-004)")
 
-        # Tab 4: Shipping Lines (MD-005)
+        # Tab 4: Customs Tariff (MD-008)
+        self.tab_tariffs = self._build_tariffs_tab()
+        self.tabs.addTab(self.tab_tariffs, "📋  التعريفة الجمركية (MD-008)")
+
+        # Tab 5: Container Specifications (MD-010)
+        self.tab_containers = self._build_containers_tab()
+        self.tabs.addTab(self.tab_containers, "📦  مواصفات الحاويات (MD-010)")
+
+        # Tab 6: Shipping Lines (MD-005)
         self.tab_shipping_lines = self._build_shipping_lines_tab()
         self.tabs.addTab(self.tab_shipping_lines, "🚢  الخطوط الملاحية (MD-005)")
 
-        # Tab 5: Currencies (MD-006)
+        # Tab 7: Currencies (MD-006)
         self.tab_currencies = self._build_currencies_tab()
         self.tabs.addTab(self.tab_currencies, "💱  العملات (MD-006)")
 
-        # Tab 6: Incoterms (MD-007)
+        # Tab 8: Incoterms (MD-007)
         self.tab_incoterms = self._build_incoterms_tab()
         self.tabs.addTab(self.tab_incoterms, "📜  قواعد Incoterms 2020 (MD-007)")
 
-        # Tab 7: Projects (MD-008)
+        # Tab 9: Projects (MD-008)
         self.tab_projects = self._build_projects_tab()
         self.tabs.addTab(self.tab_projects, "📁  إدارة المشاريع (MD-008)")
 
@@ -195,7 +205,67 @@ class MasterDataView(QWidget):
         layout.addWidget(self.table_providers)
         return widget
 
-    # ── 4. Shipping Lines Tab (MD-005) ─────────────────────────────────
+    # ── 4. Customs Tariff Tab (MD-008) ─────────────────────────────────
+    def _build_tariffs_tab(self) -> QWidget:
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+
+        btn_bar = QHBoxLayout()
+        btn_refresh = QPushButton(i18n.t("btn_refresh_data"))
+        btn_refresh.setCursor(Qt.CursorShape.PointingHandCursor)
+        btn_refresh.setFont(QFont("Cairo", 12, QFont.Weight.Bold))
+        btn_refresh.clicked.connect(self.load_tariffs)
+        btn_bar.addWidget(btn_refresh)
+        btn_bar.addStretch()
+        layout.addLayout(btn_bar)
+
+        self.table_tariffs = QTableWidget()
+        self.table_tariffs.setColumnCount(5)
+        self.table_tariffs.setHorizontalHeaderLabels([
+            "البند الجمركي (HS Code)", "الوصف الجمركي", "نسبة الوارد %",
+            "القيمة المضافة %", "الجهة الرقابية"
+        ])
+        self.table_tariffs.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.table_tariffs.setAlternatingRowColors(True)
+        self.table_tariffs.setShowGrid(False)
+        self.table_tariffs.verticalHeader().setVisible(False)
+        self.table_tariffs.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self.table_tariffs.setFont(QFont(FONT_ARABIC, TYPO_TABLE[0]))
+
+        layout.addWidget(self.table_tariffs)
+        return widget
+
+    # ── 5. Container Specs Tab (MD-010) ────────────────────────────────
+    def _build_containers_tab(self) -> QWidget:
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+
+        btn_bar = QHBoxLayout()
+        btn_refresh = QPushButton(i18n.t("btn_refresh_data"))
+        btn_refresh.setCursor(Qt.CursorShape.PointingHandCursor)
+        btn_refresh.setFont(QFont("Cairo", 12, QFont.Weight.Bold))
+        btn_refresh.clicked.connect(self.load_containers)
+        btn_bar.addWidget(btn_refresh)
+        btn_bar.addStretch()
+        layout.addLayout(btn_bar)
+
+        self.table_containers = QTableWidget()
+        self.table_containers.setColumnCount(5)
+        self.table_containers.setHorizontalHeaderLabels([
+            "نوع الحاوية", "السعة (CBM)", "وزن الفارغ (kg)",
+            "أقصى حمولة (kg)", "أبعاد الباب (سم)"
+        ])
+        self.table_containers.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.table_containers.setAlternatingRowColors(True)
+        self.table_containers.setShowGrid(False)
+        self.table_containers.verticalHeader().setVisible(False)
+        self.table_containers.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self.table_containers.setFont(QFont(FONT_ARABIC, TYPO_TABLE[0]))
+
+        layout.addWidget(self.table_containers)
+        return widget
+
+    # ── 6. Shipping Lines Tab (MD-005) ─────────────────────────────────
     def _build_shipping_lines_tab(self) -> QWidget:
         widget = QWidget()
         layout = QVBoxLayout(widget)
@@ -233,7 +303,7 @@ class MasterDataView(QWidget):
         layout.addWidget(self.table_shipping_lines)
         return widget
 
-    # ── 5. Currencies Tab (MD-006) ─────────────────────────────────────
+    # ── 7. Currencies Tab (MD-006) ─────────────────────────────────────
     def _build_currencies_tab(self) -> QWidget:
         widget = QWidget()
         layout = QVBoxLayout(widget)
@@ -271,7 +341,7 @@ class MasterDataView(QWidget):
         layout.addWidget(self.table_currencies)
         return widget
 
-    # ── 6. Incoterms Tab (MD-007) ──────────────────────────────────────
+    # ── 8. Incoterms Tab (MD-007) ──────────────────────────────────────
     def _build_incoterms_tab(self) -> QWidget:
         widget = QWidget()
         layout = QVBoxLayout(widget)
@@ -309,7 +379,7 @@ class MasterDataView(QWidget):
         layout.addWidget(self.table_incoterms)
         return widget
 
-    # ── 7. Projects Tab (MD-008) ───────────────────────────────────────
+    # ── 9. Projects Tab (MD-008) ───────────────────────────────────────
     def _build_projects_tab(self) -> QWidget:
         widget = QWidget()
         layout = QVBoxLayout(widget)
@@ -352,6 +422,8 @@ class MasterDataView(QWidget):
         self.load_companies()
         self.load_suppliers()
         self.load_providers()
+        self.load_tariffs()
+        self.load_containers()
         self.load_shipping_lines()
         self.load_currencies()
         self.load_incoterms()
@@ -426,6 +498,50 @@ class MasterDataView(QWidget):
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
                 self.table_providers.setItem(row, col, item)
             self.table_providers.setRowHeight(row, DIM_TABLE_ROW)
+
+    def load_tariffs(self):
+        records = self.repo.get_all_customs_tariffs()
+        if not records:
+            self.repo.create_customs_tariff({
+                "hs_code": "6701067200",
+                "hs_description": "أجهزة إلكترونية ومعدات اختبارات قياسية",
+                "customs_duty_pct": 0.05,
+                "vat_pct": 0.14,
+                "regulatory_authority": "الهيئة العامة للرقابة على الصادرات والواردات (GOEIC)"
+            })
+            records = self.repo.get_all_customs_tariffs()
+
+        self.table_tariffs.setRowCount(len(records))
+        for row, rec in enumerate(records):
+            duty_pct_str = f"{float(rec.customs_duty_pct)*100:.1f}%"
+            vat_pct_str = f"{float(rec.vat_pct)*100:.1f}%"
+            items = [rec.hs_code, rec.hs_description or "-", duty_pct_str, vat_pct_str, rec.regulatory_authority or "-"]
+            for col, text in enumerate(items):
+                item = QTableWidgetItem(str(text))
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
+                self.table_tariffs.setItem(row, col, item)
+            self.table_tariffs.setRowHeight(row, DIM_TABLE_ROW)
+
+    def load_containers(self):
+        records = self.repo.get_all_container_specs()
+        if not records:
+            specs = [
+                {"container_type": "20GP", "internal_length_cm": 589, "internal_width_cm": 235, "internal_height_cm": 239, "door_width_cm": 234, "door_height_cm": 228, "cubic_capacity_cbm": 33.2, "tare_weight_kg": 2200, "max_payload_kg": 28200, "max_gross_weight_kg": 30400, "floor_area_sqm": 13.8},
+                {"container_type": "40HC", "internal_length_cm": 1203, "internal_width_cm": 235, "internal_height_cm": 269, "door_width_cm": 234, "door_height_cm": 258, "cubic_capacity_cbm": 76.4, "tare_weight_kg": 3900, "max_payload_kg": 26580, "max_gross_weight_kg": 30480, "floor_area_sqm": 28.2}
+            ]
+            for s in specs:
+                self.repo.create_container_spec(s)
+            records = self.repo.get_all_container_specs()
+
+        self.table_containers.setRowCount(len(records))
+        for row, rec in enumerate(records):
+            door_dim = f"{float(rec.door_width_cm):.0f}x{float(rec.door_height_cm):.0f}"
+            items = [rec.container_type, f"{float(rec.cubic_capacity_cbm):.1f}", f"{float(rec.tare_weight_kg):.0f}", f"{float(rec.max_payload_kg):.0f}", door_dim]
+            for col, text in enumerate(items):
+                item = QTableWidgetItem(str(text))
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
+                self.table_containers.setItem(row, col, item)
+            self.table_containers.setRowHeight(row, DIM_TABLE_ROW)
 
     def load_shipping_lines(self):
         records = self.session.query(ShippingLine).all()
