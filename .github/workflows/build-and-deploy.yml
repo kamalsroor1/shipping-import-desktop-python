@@ -29,7 +29,7 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
 
-      - name: Build Standalone Executable with PyInstaller
+      - name: Build Standalone Executable with PyInstaller (--onefile)
         run: |
           python build_app.py
 
@@ -37,7 +37,7 @@ jobs:
         shell: powershell
         run: |
           New-Item -ItemType Directory -Force -Path deploy_updates
-          Copy-Item -Path "dist\ImportManagementSystem\ImportManagementSystem.exe" -Destination "deploy_updates\ImportManagementSystem.exe"
+          Copy-Item -Path "dist\ImportManagementSystem.exe" -Destination "deploy_updates\ImportManagementSystem.exe"
           Copy-Item -Path "version_example.json" -Destination "deploy_updates\version.json"
           Copy-Item -Path "download_page.html" -Destination "deploy_updates\index.html"
 

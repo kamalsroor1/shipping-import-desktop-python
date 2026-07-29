@@ -1,5 +1,5 @@
 """
-PyInstaller Build Script — Compiles the Enterprise Import System into a standalone Windows .exe with custom branding logo icon.
+PyInstaller Build Script — Compiles the Enterprise Import System into a SINGLE Standalone Windows .exe (--onefile).
 Works both locally and in CI/CD environments (GitHub Actions).
 """
 
@@ -8,7 +8,7 @@ import sys
 import os
 
 def build():
-    print("Starting PyInstaller Build Process...")
+    print("Starting PyInstaller Single-File Build Process...")
     base_dir = os.path.dirname(os.path.abspath(__file__))
     icon_path = os.path.join(base_dir, "src", "assets", "app_icon.ico")
     icon_arg = [f"--icon={icon_path}"] if os.path.exists(icon_path) else []
@@ -16,6 +16,7 @@ def build():
     cmd = [
         sys.executable, "-m", "PyInstaller",
         "--name=ImportManagementSystem",
+        "--onefile",
         "--windowed",
         "--noconfirm",
         "--clean",
@@ -34,8 +35,8 @@ def build():
     print("Executing build command:", " ".join(cmd))
     res = subprocess.run(cmd, cwd=base_dir)
     if res.returncode == 0:
-        print("\nBUILD SUCCESSFUL!")
-        print(f"The compiled executable is located at: {os.path.join(base_dir, 'dist', 'ImportManagementSystem', 'ImportManagementSystem.exe')}")
+        print("\nSINGLE-FILE BUILD SUCCESSFUL!")
+        print(f"The standalone executable is located at: {os.path.join(base_dir, 'dist', 'ImportManagementSystem.exe')}")
     else:
         print("\nBuild failed with return code:", res.returncode)
         sys.exit(res.returncode)
