@@ -1,7 +1,7 @@
 """
 Operations View — Pure Arabic / English i18n
-Integrated Coverage for BP-001 through BP-008
-Includes Registered Files, CBM & Duties Calculators, BP-006 Freight Quotations & BP-007 Customs Checklist
+Integrated Coverage for BP-001 through BP-021
+Includes Container Fitting (BP-005), Shipping Scenarios (BP-007), ACID Verification (BP-014), and Dual Approval (BP-019)
 """
 
 from PySide6.QtWidgets import (
@@ -11,11 +11,17 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
+from datetime import date
 
 from src.database.session import SessionLocal
 from src.database.repositories.import_file_repository import ImportFileRepository
 from src.services.cbm_calculator import CBMCalculator
 from src.services.duties_estimator import DutiesEstimator
+from src.services.loading_calculator import LoadingCalculationEngine
+from src.services.shipping_scenario_service import ShippingScenarioEvaluator
+from src.services.acid_service import ACIDVerificationService
+from src.services.document_approval_service import DocumentDualApprovalManager
+
 from src.ui.forms.new_import_file_form import NewImportFileForm
 from src.ui.styles.tokens import *
 from src.utils.i18n import i18n
@@ -40,13 +46,17 @@ class OperationsView(QWidget):
         self.tab_workspace = self._build_workspace_tab()
         self.main_tabs.addTab(self.tab_workspace, "📦  ملفات الاستيراد والحواسب (BP-001 - BP-005 & BP-008)")
 
-        # Tab 2: Freight Quotations Carrier Rate Comparison (BP-006)
-        self.tab_freight = self._build_freight_tab()
-        self.main_tabs.addTab(self.tab_freight, "🚢  عروض أسعار الشحن ومقارنة الإبحار (BP-006)")
+        # Tab 2: Container Loading Optimization (BP-005)
+        self.tab_container_loading = self._build_container_loading_tab()
+        self.main_tabs.addTab(self.tab_container_loading, "🏗️  تخطيط وتحسين تحميل الحاوية (BP-005)")
 
-        # Tab 3: Customs Consultation Checklist (BP-007)
+        # Tab 3: Freight & ETA Scenarios (BP-006 & BP-007)
+        self.tab_freight = self._build_freight_tab()
+        self.main_tabs.addTab(self.tab_freight, "🚢  عروض الأسعار وتوقع الوصول (BP-006 & BP-007)")
+
+        # Tab 4: Customs Consultation & Dual Approval (BP-014 & BP-019)
         self.tab_customs = self._build_customs_tab()
-        self.main_tabs.addTab(self.tab_customs, "📋  التدقيق الجمركي وقائمة المستندات (BP-007)")
+        self.main_tabs.addTab(self.tab_customs, "📋  التدقيق والاعتماد المزدوج (BP-014 & BP-019)")
 
         layout.addWidget(self.main_tabs)
         self.load_import_files()
@@ -58,7 +68,6 @@ class OperationsView(QWidget):
         widget = QWidget()
         layout = QVBoxLayout(widget)
 
-        # Top Group: Registered Files Table
         top_group = QGroupBox(i18n.t("ops_files_group"))
         top_layout = QVBoxLayout(top_group)
 
@@ -213,13 +222,66 @@ class OperationsView(QWidget):
 
         return widget
 
-    # ── Tab 2: Freight Quotations Comparison (BP-006) ─────────────────
+    # ── Tab 2: Container Loading Optimization (BP-005) ────────────────
+    def _build_container_loading_tab(self) -> QWidget:
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+
+        box = QGroupBox("🏗️  محاكي تخطيط شحن البضائع وتحسين سعة الحاوية (BP-005)")
+        form = QFormLayout(box)
+        form.setSpacing(SPACING_MD)
+
+        self.cmb_container_type = QComboBox()
+        self.cmb_container_type.addItems(["40HC", "20GP", "40GP", "45HC"])
+
+        self.spin_total_cbm = QDoubleSpinBox()
+        self.spin_total_cbm.setRange(0.1, 200.0)
+        self.spin_total_cbm.setValue(48.5)
+
+        self.spin_total_weight = QDoubleSpinBox()
+        self.spin_total_weight.setRange(10, 100000.0)
+        self.spin_total_weight.setValue(18500.0)
+        self.spin_total_weight.setSuffix(" kg")
+
+        self.lbl_fit_status = QLabel("جاهز للتقييم")
+        self.lbl_fit_status.setFont(QFont(FONT_ARABIC, 13, QFont.Weight.Bold))
+
+        self.lbl_space_util = QLabel("0.0%")
+        self.lbl_payload_util = QLabel("0.0%")
+
+        btn_eval_fit = QPushButton("⚡  تقييم ملاءمة الحاوية")
+        btn_eval_fit.setFont(QFont(FONT_ARABIC, 12, QFont.Weight.Bold))
+        btn_eval_fit.setStyleSheet("background-color: #d35400; color: #ffffff;")
+        btn_eval_fit.clicked.connect(self._run_container_evaluation)
+
+        form.addRow("نوع الحاوية المطلوب:", self.cmb_container_type)
+        form.addRow("إجمالي الحجم الكلي (CBM):", self.spin_total_cbm)
+        form.addRow("إجمالي الوزن القائم (kg):", self.spin_total_weight)
+        form.addRow("حالة الملاءمة والاحتواء:", self.lbl_fit_status)
+        form.addRow("نسبة استغلال الحجم السعي:", self.lbl_space_util)
+        form.addRow("نسبة استغلال الوزن المسموح:", self.lbl_payload_util)
+        form.addRow(btn_eval_fit)
+
+        layout.addWidget(box)
+        return widget
+
+    def _run_container_evaluation(self):
+        ctype = self.cmb_container_type.currentText()
+        cbm = self.spin_total_cbm.value()
+        wt = self.spin_total_weight.value()
+
+        res = LoadingCalculationEngine.evaluate_container_fit(total_cbm=cbm, total_gross_weight_kg=wt, container_type=ctype)
+        self.lbl_fit_status.setText(f"{res['status']} — {res['status_message']}")
+        self.lbl_space_util.setText(f"{res['space_utilization_pct']}%")
+        self.lbl_payload_util.setText(f"{res['payload_utilization_pct']}%")
+
+    # ── Tab 3: Freight Quotations Comparison (BP-006 & BP-007) ───────
     def _build_freight_tab(self) -> QWidget:
         widget = QWidget()
         layout = QVBoxLayout(widget)
 
         hdr_row = QHBoxLayout()
-        lbl_info = QLabel("🚢  مقارنة عروض أسعار شركات الشحن وتتبع ززمن الإبحار (BP-006)")
+        lbl_info = QLabel("🚢  مقارنة عروض أسعار شركات الشحن وتوقعات وصول المخزن (BP-006 & BP-007)")
         lbl_info.setFont(QFont("Cairo", 14, QFont.Weight.Bold))
         lbl_info.setStyleSheet("color: #38bdf8;")
         hdr_row.addWidget(lbl_info)
@@ -246,13 +308,13 @@ class OperationsView(QWidget):
         layout.addWidget(self.table_freight)
         return widget
 
-    # ── Tab 3: Customs Consultation Checklist (BP-007) ────────────────
+    # ── Tab 4: Customs Consultation & Dual Approval (BP-014 & BP-019) ──
     def _build_customs_tab(self) -> QWidget:
         widget = QWidget()
         layout = QVBoxLayout(widget)
 
         hdr_row = QHBoxLayout()
-        lbl_info = QLabel("📋  التدقيق الجمركي المسبق وفحص اكتمال مستندات الشحنة (BP-007)")
+        lbl_info = QLabel("📋  التدقيق الجمركي ورقم نافذة ACID والاعتماد المزدوج للمستندات (BP-014 & BP-019)")
         lbl_info.setFont(QFont("Cairo", 14, QFont.Weight.Bold))
         lbl_info.setStyleSheet("color: #38bdf8;")
         hdr_row.addWidget(lbl_info)
@@ -263,7 +325,7 @@ class OperationsView(QWidget):
         self.table_customs = QTableWidget()
         self.table_customs.setColumnCount(5)
         self.table_customs.setHorizontalHeaderLabels([
-            "ملف الاستيراد", "نوع المستند الجمركي", "مستند إلزامي", "حالة المراجعة من المخلص", "ملاحظات وتوصيات التخليص"
+            "ملف الاستيراد", "نوع المستند الجمركي", "مستند إلزامي", "حالة المراجعة والاعتماد المزدوج", "ملاحظات وتوصيات التخليص"
         ])
         self.table_customs.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.table_customs.setAlternatingRowColors(True)
@@ -291,7 +353,6 @@ class OperationsView(QWidget):
     def load_freight_quotations(self):
         records = self.session.query(FreightQuotation).all()
         if not records:
-            from datetime import date
             q1 = FreightQuotation(
                 import_file_id="IMP-2026-0001",
                 carrier_name="Maersk Line / الشرق الأوسط للشحن",
@@ -340,7 +401,6 @@ class OperationsView(QWidget):
             self.table_customs.setRowHeight(row, DIM_TABLE_ROW)
 
     def _add_sample_freight_quote(self):
-        from datetime import date
         q = FreightQuotation(
             import_file_id="IMP-2026-0001",
             carrier_name="COSCO Shipping Agency",
