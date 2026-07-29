@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MasterDataContract",
+  "type": "object",
+  "properties": {
+    "importer": {
+      "type": "object",
+      "required": ["company_id", "egyptian_importer_name", "importer_id", "importer_id_expiration_date", "vat_id", "vat_id_expiration_date"],
+      "properties": {
+        "company_id": { "type": "integer" },
+        "egyptian_importer_name": { "type": "string" },
+        "importer_id": { "type": "string" },
+        "importer_id_expiration_date": { "type": "string", "format": "date" },
+        "vat_id": { "type": "string" },
+        "vat_id_expiration_date": { "type": "string", "format": "date" },
+        "commercial_registration_no": { "type": "string" },
+        "commercial_registration_expiration": { "type": "string", "format": "date" }
+      }
+    },
+    "supplier": {
+      "type": "object",
+      "required": ["supplier_id", "vendor_company_name", "registration_type", "foreign_exporter_id", "foreign_exporter_country_code"],
+      "properties": {
+        "supplier_id": { "type": "integer" },
+        "vendor_company_name": { "type": "string" },
+        "registration_type": { "type": "string", "enum": ["Company", "Individual"] },
+        "foreign_exporter_id": { "type": "string" },
+        "foreign_exporter_country_code": { "type": "string", "minLength": 2, "maxLength": 3 },
+        "swift_code": { "type": "string" },
+        "iban_account_no": { "type": "string" }
+      }
+    }
+  }
+}
