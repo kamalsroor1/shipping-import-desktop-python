@@ -1,0 +1,30 @@
+# =====================================================================
+# Import Management System - Python Desktop Application Requirements
+# =====================================================================
+
+# GUI Framework (Qt for Python - Industry Standard & Modern UI)
+PySide6>=6.6.0
+
+# Database ORM & Driver (PostgreSQL & SQLite)
+SQLAlchemy>=2.0.25
+psycopg2-binary>=2.9.9
+alembic>=1.13.1
+
+# Data Validation & Settings Management
+pydantic>=2.6.0
+pydantic-settings>=2.1.0
+python-dotenv>=1.0.1
+
+# Document Generation & Data Export (PDF, Excel)
+openpyxl>=3.1.2
+reportlab>=4.1.0
+pandas>=2.2.0
+
+# Testing & Code Quality
+pytest>=8.0.0
+pytest-qt>=4.4.0
+black>=24.1.0
+flake8>=7.0.0
+
+# Build & Packaging (Executable Creation)
+PyInstaller>=6.4.0
