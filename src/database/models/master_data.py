@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, BigInteger, String, Text, Date, DateTime, Numeric, Boolean, ForeignKey, UniqueConstraint, func
 from sqlalchemy.orm import relationship
+from datetime import date
 from src.database.session import Base
 
 class Company(Base):
@@ -24,6 +25,24 @@ class Company(Base):
     updated_by = Column(BigInteger, nullable=True)
     deleted_at = Column(DateTime(timezone=True), nullable=True)
 
+    @property
+    def days_to_renew_importer_id(self) -> int:
+        if self.importer_id_expiration_date:
+            return (self.importer_id_expiration_date - date.today()).days
+        return 0
+
+    @property
+    def days_to_renew_vat_id(self) -> int:
+        if self.vat_id_expiration_date:
+            return (self.vat_id_expiration_date - date.today()).days
+        return 0
+
+    @property
+    def days_to_renew_commercial_reg(self) -> int:
+        if self.commercial_registration_expiration:
+            return (self.commercial_registration_expiration - date.today()).days
+        return 0
+
 class Supplier(Base):
     """MD-002 Foreign Exporter Supplier"""
     __tablename__ = "suppliers"
@@ -38,6 +57,9 @@ class Supplier(Base):
     phone_number = Column(String(32), nullable=True)
     email = Column(String(255), nullable=True)
     brands = Column(Text, nullable=True)
+    bank_name = Column(String(255), nullable=True)
+    swift_code = Column(String(32), nullable=True)
+    iban_account_no = Column(String(128), nullable=True)
     status = Column(String(16), nullable=False, default="active")
 
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
