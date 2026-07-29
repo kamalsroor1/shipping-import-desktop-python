@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحميل نظام إدارة الاستيراد والجمارك — Import ERP System</title>
+    <title>تحميل نظام إدارة الاستيراد والجمارك — IMS ERP</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
@@ -27,9 +27,15 @@
             text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
-        .icon {
-            font-size: 64px;
+        .icon-box {
             margin-bottom: 20px;
+        }
+        .icon-img {
+            width: 110px;
+            height: 110px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            border: 2px solid rgba(255,255,255,0.2);
         }
         h1 {
             font-size: 24px;
@@ -73,22 +79,40 @@
             border-top: 1px solid rgba(255,255,255,0.08);
             padding-top: 18px;
         }
+        .version-badge {
+            color: #38ef7d;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <div class="card">
-        <div class="icon">🚢</div>
-        <h1>نظام إدارة الاستيراد والجمارك</h1>
-        <p>النسخة الرسمية المعتمدة لسطح المكتب (Windows Executable). تشمل حاسبة CBM، التقدير الجمركي، وإدارة الشحنات المرجعية.</p>
+        <div class="icon-box">
+            <img src="https://shipping.baraa-solutions.com/updates/app_icon.png" alt="IMS Logo" class="icon-img" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><text x=\'20\' y=\'65\' font-size=\'60\'>🚢</text></svg>';">
+        </div>
+        <h1>نظام إدارة الاستيراد والجمارك (IMS)</h1>
+        <p>النسخة الرسمية المعتمدة لسطح المكتب (Windows Standalone Executable). تشمل حاسبة CBM، التقدير الجمركي، وإدارة الشحنات المرجعية.</p>
         
-        <a href="ims.exe" class="btn-download">
-            📥 تحميل برنامج IMS المباشر (Direct Download ims.exe)
+        <a href="IMS.exe" class="btn-download">
+            📥 تحميل برنامج IMS المباشر (Direct Download IMS.exe)
         </a>
 
         <div class="meta">
             <span>💻 نظام التشغيل: Windows 10 / 11</span>
-            <span>⚡ الإصدار: v1.0.0</span>
+            <span class="version-badge" id="app-version">⚡ الإصدار: v1.0.1</span>
         </div>
     </div>
+
+    <!-- Automated Live Version Fetch & Sync -->
+    <script>
+        fetch('version.json?cache=' + new Date().getTime())
+            .then(response => response.json())
+            .then(data => {
+                if (data.latest_version) {
+                    document.getElementById('app-version').innerText = '⚡ الإصدار: v' + data.latest_version;
+                }
+            })
+            .catch(err => console.log('Version sync:', err));
+    </script>
 </body>
 </html>

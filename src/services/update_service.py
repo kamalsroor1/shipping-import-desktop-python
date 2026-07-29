@@ -11,7 +11,7 @@ import subprocess
 from PySide6.QtCore import QThread, Signal
 from src.utils.i18n import i18n
 
-CURRENT_VERSION = "1.0.0"
+CURRENT_VERSION = "1.0.1"
 DEFAULT_UPDATE_URL = "https://shipping.baraa-solutions.com/updates/version.json"
 
 
@@ -98,10 +98,11 @@ class AutoUpdateManager:
         """Creates a temporary updater.bat script to replace running binary and restart."""
         bat_content = f"""@echo off
 timeout /t 2 /nobreak > NUL
+taskkill /F /IM IMS.exe > NUL 2>&1
 taskkill /F /IM ims.exe > NUL 2>&1
 taskkill /F /IM ImportManagementSystem.exe > NUL 2>&1
-copy /Y "{new_exe_path}" "ims.exe"
-start ims.exe
+copy /Y "{new_exe_path}" "IMS.exe"
+start IMS.exe
 del "{new_exe_path}"
 del "%~f0"
 """
