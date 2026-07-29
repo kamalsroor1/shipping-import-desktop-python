@@ -48,8 +48,19 @@ class ImportFileRepository:
     def get_all_import_files(self) -> List[ImportFile]:
         return self.session.query(ImportFile).order_by(ImportFile.created_at.desc()).all()
 
+    def get_files_by_stage(self, stage_name: str) -> List[ImportFile]:
+        return self.session.query(ImportFile).filter(ImportFile.stage == stage_name, ImportFile.status == 'active').all()
+
     def get_file_by_id(self, file_id: str) -> Optional[ImportFile]:
         return self.session.query(ImportFile).filter(ImportFile.import_file_id == file_id).first()
+
+    def update_file_stage(self, file_id: str, new_stage: str) -> Optional[ImportFile]:
+        f = self.get_file_by_id(file_id)
+        if f:
+            f.stage = new_stage
+            self.session.commit()
+            self.session.refresh(f)
+        return f
 
     def add_item_to_file(self, file_id: str, item_data: dict) -> ImportFileItem:
         item = ImportFileItem(
