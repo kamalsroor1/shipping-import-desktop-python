@@ -1,0 +1,21 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database files
+*.db
+*.sqlite3
+
+# Build & Dist output
+build/
+dist/
+installer_output/
+*.spec
+temp_update.exe
+updater.bat
+
+# Pytest & Cache
+.pytest_cache/
+.vscode/
+.idea/
