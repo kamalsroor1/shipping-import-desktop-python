@@ -1,19 +1,19 @@
-; Inno Setup Script for Enterprise Import Management System
-; Compiles dist/ImportManagementSystem into a professional Windows Installer Setup wizard
+; Inno Setup Script for IMS Import Management System
+; Compiles dist/IMS.exe into a professional Windows Installer Setup wizard
 
 [Setup]
-AppName=Enterprise Import Management System
-AppVersion=1.0.0
-AppPublisher=Egyptian Import ERP Co.
-AppPublisherURL=https://your-domain.com
-DefaultDirName={autopf}\ImportManagementSystem
-DefaultGroupName=Enterprise Import Management System
+AppName=IMS Import Management System
+AppVersion=1.1.0
+AppPublisher=Baraa Solutions
+AppPublisherURL=https://shipping.baraa-solutions.com
+DefaultDirName={autopf}\IMS_ImportSystem
+DefaultGroupName=IMS Import Management System
 OutputDir=installer_output
-OutputBaseFilename=Setup_ImportManagementSystem_v1.0.0
+OutputBaseFilename=Setup_IMS_v1.1.0
 Compression=lzma2/max
 SolidCompression=yes
 SetupIconFile=src\assets\app_icon.ico
-UninstallDisplayIcon={app}\ImportManagementSystem.exe
+UninstallDisplayIcon={app}\IMS.exe
 WizardStyle=modern
 
 [Languages]
@@ -21,15 +21,15 @@ Name: "arabic"; MessagesFile: "compiler:Languages\Arabic.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checked
 
 [Files]
-Source: "dist\ImportManagementSystem\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "dist\IMS.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\Enterprise Import System"; Filename: "{app}\ImportManagementSystem.exe"; IconFilename: "{app}\src\assets\app_icon.ico"
-Name: "{group}\{cm:UninstallProgram,Enterprise Import System}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\Enterprise Import System"; Filename: "{app}\ImportManagementSystem.exe"; IconFilename: "{app}\src\assets\app_icon.ico"; Tasks: desktopicon
+Name: "{group}\IMS Import Management System"; Filename: "{app}\IMS.exe"
+Name: "{group}\{cm:UninstallProgram,IMS Import System}"; Filename: "{uninstallexe}"
+Name: "{autodesktop}\IMS Import Management System"; Filename: "{app}\IMS.exe"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\ImportManagementSystem.exe"; Description: "{cm:LaunchProgram,Enterprise Import System}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\IMS.exe"; Description: "{cm:LaunchProgram,IMS Import System}"; Flags: nowait postinstall skipifsilent
