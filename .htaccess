@@ -1,0 +1,23 @@
+# Apache / Hostinger HTTP Redirect & Security Settings for IMS Updates Page
+
+RewriteEngine On
+
+# Automatically redirect HTTP to HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Optional: Enable DirectoryIndex
+DirectoryIndex index.html download_page.html
+
+# Cache Control for version.json to ensure live update checks
+<FilesMatch "version\.json$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires 0
+</FilesMatch>
+
+# Allow Direct Download for Executables
+<FilesMatch "\.(exe|json|html|png|ico)$">
+    Order allow,deny
+    Allow from all
+</FilesMatch>

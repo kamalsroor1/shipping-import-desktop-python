@@ -42,6 +42,7 @@ jobs:
           Copy-Item -Path "dist\IMS.exe" -Destination "deploy_updates\ImportManagementSystem.exe"
           Copy-Item -Path "version_example.json" -Destination "deploy_updates\version.json"
           Copy-Item -Path "download_page.html" -Destination "deploy_updates\index.html"
+          Copy-Item -Path ".htaccess" -Destination "deploy_updates\.htaccess"
           Copy-Item -Path "src\assets\app_icon.png" -Destination "deploy_updates\app_icon.png"
 
       - name: Deploy Updates to Hostinger via FTPS
@@ -50,7 +51,7 @@ jobs:
           server: 'shipping.baraa-solutions.com'
           username: 'u910151740.shipping.baraa-solutions.com'
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /updates/
+          server-dir: /files/public_html/updates/
           local-dir: ./deploy_updates/
           port: 21
           protocol: ftps
