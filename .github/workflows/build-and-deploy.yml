@@ -47,7 +47,7 @@ jobs:
       - name: Deploy Updates to Hostinger via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: '145.79.20.98'
+          server: 'shipping.baraa-solutions.com'
           username: 'u910151740.shipping.baraa-solutions.com'
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: /updates/
@@ -55,4 +55,4 @@ jobs:
           port: 21
           protocol: ftps
           security: loose
-          timeout: 120000
+          timeout: 180000
