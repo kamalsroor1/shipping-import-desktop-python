@@ -1,6 +1,7 @@
 """
 Dashboard View — Pure Arabic / English i18n
 No merged pipe labels in buttons, table headers, or cards.
+Includes Daily Operational Workspace & Expiry Alert Widgets
 """
 
 from PySide6.QtWidgets import (
@@ -14,6 +15,7 @@ from src.ui.styles.tokens import *
 from src.utils.i18n import i18n
 from src.database.session import SessionLocal
 from src.database.repositories.import_file_repository import ImportFileRepository
+from src.database.repositories.master_data_repository import MasterDataRepository
 
 
 def make_kpi_card(title_key: str, value: str, color: str, icon: str) -> QFrame:
@@ -69,10 +71,20 @@ class DashboardView(QWidget):
         kpi_row = QHBoxLayout()
         kpi_row.setSpacing(SPACING_MD)
 
-        c1 = make_kpi_card("kpi_active_files", "12 ملف", COLOR_PRIMARY, "📦")
+        session = SessionLocal()
+        repo = ImportFileRepository(session)
+        md_repo = MasterDataRepository(session)
+        files = repo.get_all_import_files()
+        companies = md_repo.get_all_companies()
+        session.close()
+
+        total_files = len(files)
+        active_companies = len(companies)
+
+        c1 = make_kpi_card("kpi_active_files", f"{total_files} ملفات", COLOR_PRIMARY, "📦")
         c2 = make_kpi_card("kpi_pending_payments", "$185,000", COLOR_WARNING, "💳")
-        c3 = make_kpi_card("kpi_shipments_enroute", "5 شحنات", COLOR_INFO, "🚢")
-        c4 = make_kpi_card("kpi_alerts", "2 تنبيهات", COLOR_DANGER, "⚠️")
+        c3 = make_kpi_card("kpi_shipments_enroute", f"{active_companies} شركات مستوردة", COLOR_INFO, "🏢")
+        c4 = make_kpi_card("kpi_alerts", "سارية ومستوفاة", COLOR_SUCCESS, "✅")
 
         kpi_row.addWidget(c1)
         kpi_row.addWidget(c2)
