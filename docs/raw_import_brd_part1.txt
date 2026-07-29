@@ -1,0 +1,426 @@
+جداول اساسيه
+Mode
+Mode	Type
+sea	Text
+Air	Text
+Currency
+Currency	Text
+EGP	Text
+USD	Text
+EUR	Text
+GBP	Text
+
+Company ID
+Egyptian Importer Name	Text	
+Address	Text	
+Country	Text	
+Foreign Exporter Registration Type	Text	
+Importer ID	Num	
+Importer ID Expiration date	Date	
+Importer ID days to renew	Num	TODAYS-Importer ID Expiration date
+VAT ID	Num	
+VAT ID Expiration date	Date	
+VAT ID days to renew	Num	TODAYS-VAT ID Expiration date
+Reg. no	Num	
+Reg. no Expiration date	Date	
+Reg. no days to renew	Num	TODAYS-Reg. no days to renew
+
+Import Type
+Import Type	Type
+Commercial Import	Text
+Sample	Text
+Spare Parts	Text
+Machinery	Text
+Raw Materials	Text
+Temporary Admission	Text
+Re-Import	Text
+Personal Import	Text
+
+Supplier
+Vendor  Company Name 	Registration Type	Foreign Exporter ID	Foreign Exporter Country	Foreign Exporter Country Code	Address	Phone Number	E-Mail	Brands
+Text	Text	Text	Text	Text	Text	Text	Text	Text
+
+Project Name
+Import File ID	Project Name	Project Owner	Company name	Vendor  Company Name 	Import Type
+Num	Text	Text	from Company ID  table	from Supplier table	from Import Type
+
+Services Provider
+Services Provider Name 	Services Provider Type	Contact Name 	Phone Number	E-Mail	Payment Type	Credit limit
+Text	Text	Text	Text	Text	cash/ credit	num
+
+Priority
+Priority	Type
+High	Text
+Medium	Text
+Low	Text
+Shipment Category
+
+Shipment Category	Type
+New Purchase	Text
+Repeat Order	Text
+Urgent Shipment	Text
+Project Shipment	Text
+Consolidated Shipment	Text
+Partial Shipment	Text
+
+INCOTERM 2020
+Inco Term	Text
+Comment	Text
+Trucking Origin fees	yes or No
+Export Clearnce fees	yes or No
+OTHC fees	yes or No
+Insurance fees	yes or No
+Origin Inspection	yes or No
+O/F fees	yes or No
+Trucking Destination fees	yes or No
+DTHC fees	yes or No
+Documentation fees	yes or No
+Disclaim letter	yes or No
+Import Clearnce fees	yes or No
+Port Congestion	yes or No
+Demurrage & Detention	yes or No
+Compliance Fees	yes or No
+L/C Or Form 4 fees	yes or No
+Tax &Customs Duitys	yes or No
+Storage/Warehousing	yes or No
+
+
+
+
+
+Current Stage
+Current Module	Current Stage
+Pre-Shipment	Planning
+ 	Documentation
+ 	PI Review
+ 	ACID
+ 	Blockchain
+ 	Packing List
+ 	Final Invoice
+ 	COO
+ 	Inspection
+Shipment	Booking
+ 	Loading
+ 	Draft BL
+ 	Final BL
+ 	Courier
+Customs Clearance	Form4
+ 	Customs Assessment
+ 	Clearance
+Financial	Shipping Invoice
+ 	Broker Invoice
+ 	Customs Payment
+Warehouse	Receiving
+ 	Shortage
+ 	Damage
+Closing	Close
+
+
+Shipment Document Reference Lists
+Document Categories
+Commercial
+Certificate
+Shipping
+Egypt Import
+Customs
+
+Responsible Parties
+Supplier
+Freight Forwarder
+Shipping Line
+Customs Broker
+Company
+Finance
+Warehouse
+Bank
+
+Status
+Pending
+Received
+Under Review
+Approved
+Rejected
+Not Required
+
+Required
+Yes
+No
+Conditional
+
+Received By	text
+Received Date	date
+Verified	y/n
+Verified By	text
+Verification Date	date
+
+Document Categories	Responsible Parties	Status	Required	Received By	Received Date	Verified	Verified By	Verification Date
+Commercial	Supplier	Pending	Yes	text	date	yes/no	text	date
+Certificate	Freight Forwarder	Received	No	 	 	 	 	 
+Shipping	Shipping Line	Under Review	Conditional	 	 	 	 	 
+Egypt Import	Customs Broker	Approved	 	 	 	 	 	 
+Customs	Company	Rejected	 	 	 	 	 	 
+ 	Finance	Not Required	 	 	 	 	 	 
+ 	Warehouse	 	 	 	 	 	 	 
+
+تبداء العمليه بمجرد استلام po
+ثم
+نبداء عمليه المراجعه ومطابقه الاعداد والاوزان والاسعار واجمالى قيمه الفاتوره
+نراجع الباكينج ليست من حيث الاعداد والاوزان
+ثم نقوم بحساب cbm 
+لمعرفه اى طريقه شحن مناسبه 
+بحرى او جوى او برى
+------
+Proforma Invoice item 
+Egyptian Importer Name (text) 
+Egyptian Importer Tax ID (text) 
+Foreign Exporter Name (text) 
+Registration Type (text) 
+Foreign Exporter ID (text) 
+Country (text) 
+Country Code (text) 
+Address (text) 
+Proforma Invoice No (text) 
+Proforma Invoice Date (Date) 
+Invoice Date (Date) 
+Type of invoice (text) 
+Purchase Order No (text) 
+Purchase Order Date (Date) 
+Shipping Port (text) 
+Destination Port (text) 
+متفرع منها لكل سطر مايلى 
+HSCODE (num)
+ITEM (num) 
+QTY (num)
+PRICE (num)
+Import File ID	Proforma Invoice No	Proforma Invoice Date	Purchase Order No	Purchase Order Date	HS CODE	ITEM 	Qty PCS	Qty PKG	PRICE	TOTAL
+IMP-2026-0001	25010	24-Jul	PI 25010-2026	25-Jun	6701067200	A	2000	100	2	4000
+IMP-2026-0001	25010	24-Jul	PI 25010-2026	25-Jun	6701067200	A	4000	200	5	20000
+IMP-2026-0001	25010	24-Jul	PI 25010-2026	25-Jun	6701067200	A	2000	100	2	4000
+IMP-2026-0001	25010	24-Jul	PI 25010-2026	25-Jun	6701067201	B	4000	200	5	20000
+TOTAL= (حاصل ضرب) Qty*Price 
+
+مثال
+
+
+------------------------------
+Packing List Item
+HS CODE (num)
+ITEM (num)
+QTY (PCS) (num)
+QTY (PKG) (num)
+Net Weight (num)
+Gross Weight (num)
+Total Net Weight (num)
+Total Gross Weight (num)
+---------------------------------
+جدول 
+CBM If Ocean
+لكل سطر
+QTY* L *H *W =(total)/1000000) CBM (Cubic Meter)
+جدول
+Chargeable Weight If Air
+لكل سطر
+QTY* L *H *W =(total)/6000) kgs
+
+مثال
+Shipment Items
+
+
+
+Import File ID
+Proforma Invoice No
+HS Code
+Item Code
+Description
+Qty PCS
+Qty PKG
+Package Type
+Length
+Width
+Height
+CBM
+Chargeable Weight
+Net/Unit
+Gross/Unit
+Total Net
+Total Gross
+Unit Price
+Amount
+
+
+--------------------------------------------
+Packing List Summary By Hs code "report "
+Each HS CODE aganist total qty for hs code ,total ctn for Hs ,Total Net Weight for hs ,Total Gross Weight for hs 
+-----------------------------------------------------------
+
+↓
+
+Planning
+
+↓
+
+Customs Review
+
+↓
+
+Payment
+
+↓
+
+ACID
+
+↓
+
+Booking
+
+↓
+
+Production
+
+↓
+
+Documents
+
+↓
+
+Loading
+
+↓
+
+CargoX
+
+↓
+
+Arrival
+
+↓
+
+Form4
+
+↓
+
+Custom Clearance
+
+↓
+
+Warehouse
+
+↓
+
+Closing
+هذه هى الـ Workflow الحقيقية.
+
+نحن فى مصر نقوم بهذه الخطوات بالترتيب ولاحظ ان هناك الكثير من المراحل تتكرر
+ثم ارسال البيانات الخاصه بطلب السعر من الفريت فوردرز
+لاكثر من مورد خدمه للحصول على الاقل 3 عروض سعر 
+معرفه مواعيد 3 رحلات لمقارنه وتوقع وقت الوصول بالنسبه لتاريخ جاهزيه التحميل
+لعمل توقع لموعد الوصول ومده الشحن من تاريخ جاهزيه الشحنه
+جدول
+CRD (Date) 
+Average Form 4 Days (num)
+Average Clearance Days (num)
+Port of loading (text) 
+Port of discharge (text) 
+ثم لكل سطر
+1st Shipping Provider (text) 
+Vessel Name (text) 
+Sailing 1st Vessel Option (Date) 
+Arrival 1st Vessel Option (Date) 
+1st Vessel Option Lead time (Days) = Sailing 1st Vessel Option (Date) -Arrival 1st Vessel Option (Date) 
+Expected line delays day (Days) 
+To be ready for shipping (Days) = Sailing 1st Vessel Option (Date) - CRD (Date) 
+Expected days to Arrival at Warehouse Sailing 1st Vessel Option (Days)  = Average Form 4 Days (num)
++Average Clearance Days (num) + Expected line delays day (Days) +1st Vessel Option Lead time (Days)+ To be ready for shipping (Days)
+Expected Arrival Date at Warehouse = CRD (Date) 
++ Expected days to Arrival at Warehouse Sailing 1st Vessel Option (Days)  
+
+نكرر العمليه لكل اوبشن ومش شرط 3 اوبشن ممكن اقل او اكتر
+ونعمل متوسط لكل الاوبشنات 
+علشان نوصل لمتوسط نهائى 
+Expected days to Arrival at Warehouse Sailing   (Days)  = Average Form 4 Days (num)
++Average Clearance Days (num) + Expected line delays day (Days) +  Vessel Option Lead time (Days)+ To be ready for shipping (Days)
+Expected Arrival Date at Warehouse = CRD (Date) 
++ Expected days to Arrival at Warehouse Sailing   Vessel Option (Days)  
+----------------------------------------------------------------
+وفى نفس الوقت نعرض على المخلص الجمركى
+الفاتوره والباكينج ليست وشهاده المنشاء لمعرفه اى متطلبات تخص الجمارك المصريه قبل الشحن
+ومناقشه اسعار الضرائب والجمارك المتوقعه
+واعتماد الhs code الخاص بالمنتج والتاكد انه مسجل على منصه نافذ الخاصه بالجمارك
+مطابقه وزن القطعه خصوص انه كمثال بعض الشحنات الجوى يجب لا تزيد عن وزن 50 كيلو او قيمتها لا تزيد عن 2000 دولار لانها ستعامل كانها شحنه تجاريه فى حين انها عينات او مواد دعايا
+هدف التواصل مع المخلص هو الترتيب الكامل قبل دفع قيمه امر الشراء انه يمكننا الشحن دون مشاكل او مفاجاءت
+ثم بمجرد توقع موعد الوصول وتاريخ الوصول مقارنه بتاريخ جاهزيه الشحنه
+والتاكد انه يمكننا تنفيذ كل المتطلبات الجمركيه
+ننتقل الى
+طلب دفع قيمه الفاتوره من خلال قسم الماليه
+للحصول على رقم SWIFT
+يتم ارساله رقم السويفت البنكى للمورد لبدء عمليه التصنيع 
+ويجب علينا ذكر اسم المشروع الذى سيوجه اليه سداد هذه القيمه وهو امر ثابت فى اى مطالبه سداد للماليه
+نقوم بانشاء رقم ACID
+ويتم انشاءه بمعرفه المخلص الجمركى 
+بناء على بيانات الفاتوره
+نقوم بعمل حجز للشحن سواء بحرى او جوى 
+ولا يتم الحجز الا بوجود رقم ACID
+ويجب ان يكون موعد الCUT OFF
+متوافق مع موعد جاهزيه البضائع
+يبداء المورد فى عمليه التصنيع يتم المتابعه بشكل يومى للتاكد من انتهاء التصنيع فى 
+الوقت المتفق عليه مسبقا والذى يجب ان يكون قبل موعد 
+CUT OFF
+حتى لا نفقد موعد السفينه وهو الموعد الذى توافقنا عليه مسبقا
+بمجرد جاهزيه الشحنه لدى المورد
+نرسل الفاتوره النهائيه والباكينج النهائى وشهاده المنشاء وشهاده الفحص للمخلص الجمركى بعد مراجعتها من خلالى من حيث الاعداد والسعر والتعرف على الاختلافات ان وجدت عن الفاتوره المبدئيه
+حتى يعتمدها المخلص الجمركى مره اخرى
+بعد الاعتماد من المخلص 
+نأكد على موعد التحميل والابحار
+ثم بمجرد التحميل 
+نراجع درافت البواليصه والتاكد ان اجمالى الاعداد والاوزان مطابقه للفاتوره والباكينج ليست النهائى
+نعتمد البوليصه مع الخط الملاحى بعد ايضا مراجعه المخلص الجمركى لها 
+ثم نطلب من المورد
+تجهيز شهاده المنشاء النهائيه ويجب مراجعتها قبل اصدرها من خلالى
+حيث يجب مرجعه كل بنودها 
+وثم يجب على المورد ارسال
+كل اوراق لشحنه مختومه 
+ثم يقوم برفع على منصه Cargo X
+اوراق الشحنه والفاتوره الاليكترونيه 
+وهو اجراء مهم 
+ويجب مراجعه الاوراق قبل رفعها وذلك لان اى خطاء يتسسب فى تاخير وغرامات
+وانا مسئول عن المراجعه قبل الرفع على المنصه
+ثم نستلم اوراق الشحنه المرسله ورقيا من خلال الكوريير 
+ويجب ان يكون ذلك قبل موعد وصول الشحنه الى المينا
+ثم بمجرد وصول السفينه الى المينا
+نطلب من الفريت فوردر اصدار 
+خطاب التنازل والبوليصه الاصليه
+ثم نقوم بعمل طلب لاصدار فورم 4
+وهو اجراء بنكى ياكد اننا سددنا قيمه البضاعه لكى يتعهد البنك للجمارك ان البضائع لا تحمل اى مديونيه
+ويتطلب لاصداره
+اصل البوليصه
+اصل الفاتوره المختومه
+اصل الباكينج ليست المختوم
+نطلب من قسم الماليه اصدار هذا البيان بعد ان نسلمهم الاوراق المطلوبه
+يقوم البنك باصدار رقم فورم 4| بجانب وثيقه ورقيه
+نقوم على الفور بارسال 
+كل اوراق الشحنه الاصليه المختومه بالاضافه الى فورم 4 وخطاب التنازل من الخط الملاحى عن الشحنه
+الى المخلص الجمركى لبدء اجراءات الفحص والتخليص الجمركى
+ثم نتابع يوميا عمليه التخليص الجمركى حتى اصدار وثيقه الرسوم الجمركيه او المطالبه الجمركيه
+اقوم بمراجعه بنودها ومطابقه قيمه الضرائب والجمارك طبقا للبند الجمركى 
+ومراجعه عمليه الجمع والضرب 
+ثم نطلب من قسم الماليه تحويل القيمه الى حساب هيئه الجمارك
+ثم بمجرد السداد نرسل رقم السداد الى المخلص الجمركى
+لسداد الارضيات واستكمال اجراءات الصرف
+بمجرد ان يتم الصرف من الجمرك او الافراج عن الشحنه
+يتم ابلاغ المخزن بيبانات الشحنه واوراقها واعداداها 
+موعد وصول السائق وبياناته
+نتابع مع المخزن الاستلام من حيث الاعداد ومطابقه رقم السيل الجمركى الخاص بالشحنه قبل فتحها
+ثم نناقش الاعداد سواء العجز او الزياده
+وفى هذه الاثناء يكون قد اصدر الفريت فوردر 
+فاتوره النولون طبقا للاسعار المتفق عليها
+نقوم بمراجعتها ومطابقتها مع عرض السعر الاساسى
+ثم نطلب من الماليه سداداها
+ويجب علينا ذكر اسم المشروع الذى سيوجه اليه سداد هذه القيمه وهو امر ثابت فى اى مطالبه سداد للماليه
+ثم يقوم المخلص الجمركى
+بارسال فاتوره اتعابه بجوار قيمه الايصالات والارضيات والغرامات الخاصه بالشحنه
+ويجب علينا مطابقتها بعرض السعر الخاص المتفق عليه مسبقا
+ثم نطلب من الماليه
+ويجب علينا ذكر اسم المشروع الذى سيوجه اليه سداد هذه القيمه وهو امر ثابت فى اى مطالبه سداد للماليه
+ثم نبلغ المورد وقسم المشتريات بكل الملاحظات الخاصه بالشحنه
+ثم نتابع وصول اوراق لافراج الجمركى مختومه الى قسم الماليه
+صمم ورقه عمل ترتب هذه الاجراءات
