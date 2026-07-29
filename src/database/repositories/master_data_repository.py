@@ -5,6 +5,9 @@ from src.database.models import (
     Company, Supplier, ServiceProvider, ShippingLine,
     Currency, Incoterm, CostItem, IncotermCostRule, HSCode, Project
 )
+from src.database.models.customs_tariff import CustomsTariff
+from src.database.models.container_spec import ContainerSpec
+from src.database.models.shipping_scenario import ShippingScenario
 from src.services.audit_service import AuditService
 
 class MasterDataRepository:
@@ -93,3 +96,33 @@ class MasterDataRepository:
     # --- MD-007 Incoterms ---
     def get_all_incoterms(self) -> List[Incoterm]:
         return self.session.query(Incoterm).filter_by(status='active').all()
+
+    # --- MD-008 Customs Tariff ---
+    def create_customs_tariff(self, tariff_data: dict) -> CustomsTariff:
+        tariff = CustomsTariff(**tariff_data)
+        self.session.add(tariff)
+        self.session.commit()
+        return tariff
+
+    def get_all_customs_tariffs(self) -> List[CustomsTariff]:
+        return self.session.query(CustomsTariff).filter_by(status='active').all()
+
+    # --- MD-010 Container Specs ---
+    def create_container_spec(self, spec_data: dict) -> ContainerSpec:
+        spec = ContainerSpec(**spec_data)
+        self.session.add(spec)
+        self.session.commit()
+        return spec
+
+    def get_all_container_specs(self) -> List[ContainerSpec]:
+        return self.session.query(ContainerSpec).filter_by(status='active').all()
+
+    # --- BP-007 Shipping Scenarios ---
+    def create_shipping_scenario(self, scenario_data: dict) -> ShippingScenario:
+        sc = ShippingScenario(**scenario_data)
+        self.session.add(sc)
+        self.session.commit()
+        return sc
+
+    def get_scenarios_for_file(self, import_file_id: str) -> List[ShippingScenario]:
+        return self.session.query(ShippingScenario).filter_by(import_file_id=import_file_id).all()
