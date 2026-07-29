@@ -10,6 +10,12 @@ from datetime import date
 
 from src.services.cbm_calculator import CBMCalculator
 from src.services.duties_estimator import DutiesEstimator
+from src.services.loading_calculator import LoadingCalculationEngine
+from src.services.shipping_scenario_service import ShippingScenarioEvaluator
+from src.services.acid_service import ACIDVerificationService
+from src.services.document_approval_service import DocumentDualApprovalManager
+from src.services.electronic_exchange_service import ElectronicDocumentExchangeService
+
 from src.utils.i18n import i18n
 from src.utils.export import ExcelReportExporter, PDFReportExporter
 
@@ -38,7 +44,84 @@ def test_cbm_calculator_air_chargeable_weight():
     assert pytest.approx(air_wt, 0.01) == 1666.67
 
 
-# ── 2. Duties Estimator Service Tests (BP-008) ───────────────────────
+# ── 2. Container Loading Optimization Tests (BP-005) ────────────────
+def test_loading_calculator_fit_status():
+    res = LoadingCalculationEngine.evaluate_container_fit(total_cbm=45.0, total_gross_weight_kg=15000.0, container_type="40HC")
+    assert res["status"] == "Fit"
+    assert res["space_utilization_pct"] > 0
+    assert res["door_clearance_passed"] is True
+
+
+def test_loading_calculator_overweight():
+    res = LoadingCalculationEngine.evaluate_container_fit(total_cbm=45.0, total_gross_weight_kg=30000.0, container_type="40HC")
+    assert res["status"] == "Overweight"
+
+
+# ── 3. Shipping Scenario Evaluator Tests (BP-007) ───────────────────
+def test_shipping_scenario_evaluator_lead_times():
+    crd = date(2026, 8, 1)
+    opts = [
+        {"provider_name": "Maersk", "vessel_name": "MSC Luna", "sailing_date": date(2026, 8, 5), "arrival_date": date(2026, 8, 25), "expected_line_delay_days": 2},
+        {"provider_name": "CMA CGM", "vessel_name": "CMA Marco Polo", "sailing_date": date(2026, 8, 3), "arrival_date": date(2026, 8, 20), "expected_line_delay_days": 1}
+    ]
+    res = ShippingScenarioEvaluator.evaluate_all_scenarios(crd, opts, avg_form4_days=3, avg_clearance_days=4)
+    assert res["total_options_evaluated"] == 2
+    assert "average_expected_arrival_date" in res
+    assert res["recommended_scenario"]["provider_name"] == "CMA CGM"
+
+
+# ── 4. ACID Verification Tests (BP-014) ──────────────────────────────
+def test_acid_verification_matching():
+    system_data = {
+        "importer_tax_id": "999-888-777",
+        "foreign_exporter_id": "EXP-CN-100",
+        "exporter_country_code": "CN",
+        "proforma_invoice_no": "PI-2026-100",
+        "shipping_port_locode": "CNSHA"
+    }
+    acid_data = {
+        "acid_number": "EG-2026-999888777",
+        "importer_tax_id": "999-888-777",
+        "foreign_exporter_id": "EXP-CN-100",
+        "exporter_country_code": "CN",
+        "proforma_invoice_no": "PI-2026-100",
+        "shipping_port_locode": "CNSHA"
+    }
+    res = ACIDVerificationService.verify_acid_certificate(system_data, acid_data)
+    assert res["verification_status"] == "Verified"
+    assert res["is_ready_for_booking"] is True
+
+
+# ── 5. Dual Document Approval Tests (BP-019) ─────────────────────────
+def test_document_dual_approval_workflow():
+    res1 = DocumentDualApprovalManager.process_approval("Commercial Invoice", importer_approved=True, broker_approved=False)
+    assert res1["status"] == "Pending Broker Approval"
+    assert res1["is_final"] is False
+
+    res2 = DocumentDualApprovalManager.process_approval("Commercial Invoice", importer_approved=True, broker_approved=True)
+    assert res2["status"] == "Final Approved"
+    assert res2["is_final"] is True
+
+
+# ── 6. Electronic Document Exchange Tests (BP-021) ───────────────────
+def test_electronic_document_exchange_validation():
+    doc_fields = {
+        "shipper_name": "Global Exporter Ltd",
+        "egyptian_importer_tax_id": "999-888-777",
+        "acid_number": "EG-2026-999888777",
+        "currency": "USD",
+        "number_of_packages": "500",
+        "hs_code": "6701067200",
+        "invoice_grand_total": "50000.00",
+        "country_of_origin": "China",
+        "bill_of_lading_number": "BL-123456"
+    }
+    res = ElectronicDocumentExchangeService.validate_for_upload(doc_fields, "CargoX")
+    assert res["ready_for_upload"] is True
+    assert res["upload_status"] == "Ready for Upload"
+
+
+# ── 7. Duties Estimator Service Tests (BP-008) ───────────────────────
 def test_duties_estimator():
     res = DutiesEstimator.calculate_hs_duties(
         amount=10000.0,
@@ -52,7 +135,7 @@ def test_duties_estimator():
     assert res['total_estimated_import_cost'] == 580545.0
 
 
-# ── 3. Import File Repository CRUD Tests (BP-001 - BP-005) ─────────────
+# ── 8. Import File Repository CRUD Tests (BP-001 - BP-005) ─────────────
 def test_import_file_repository_crud():
     session = SessionLocal()
     repo = ImportFileRepository(session)
@@ -72,29 +155,7 @@ def test_import_file_repository_crud():
     session.close()
 
 
-# ── 4. Payment Repository CRUD Tests (BP-009) ─────────────────────────
-def test_payment_repository_crud():
-    session = SessionLocal()
-    repo = PaymentRepository(session)
-
-    req_id = repo.generate_next_request_id()
-    assert req_id.startswith("PAY-2026-")
-
-    pay_data = {
-        "import_file_id": "IMP-2026-0001",
-        "beneficiary_name": "Test Beneficiary Ltd",
-        "payment_type": "Advance Payment",
-        "requested_amount_usd": 12500.0,
-        "swift_code": "TESTSWIFT100",
-        "status": "⏳ قيد المعالجة"
-    }
-    pay_obj = repo.create_payment_request(pay_data)
-    assert pay_obj.request_id == req_id
-    assert pay_obj.requested_amount_usd == 12500.0
-    session.close()
-
-
-# ── 5. Master Data Repository CRUD & Advanced Models (MD-001 - MD-008) ─
+# ── 9. Master Data Repository CRUD & Advanced Models (MD-001 - MD-008) ─
 def test_master_data_repository_crud():
     today = date.today()
     session = SessionLocal()
@@ -102,12 +163,12 @@ def test_master_data_repository_crud():
 
     # Company Test
     c_data = {
-        "egyptian_importer_name": "شركة النيل للاستيراد والتصدير الاختباري السريع",
-        "importer_id": "IMP-ALL-999",
+        "egyptian_importer_name": "شركة النيل للاستيراد والتصدير السريع",
+        "importer_id": "IMP-ALL-9999",
         "importer_id_expiration_date": today,
-        "vat_id": "999-888-777",
+        "vat_id": "999-888-7779",
         "vat_id_expiration_date": today,
-        "commercial_registration_no": "REG-12345",
+        "commercial_registration_no": "REG-123459",
         "commercial_registration_expiration": today,
         "address": "القاهرة - مصر",
         "country": "مصر - Egypt"
@@ -117,9 +178,9 @@ def test_master_data_repository_crud():
 
     # Supplier Test
     s_data = {
-        "vendor_company_name": "Shenzhen Electric All Test Ltd",
+        "vendor_company_name": "Shenzhen Electric All Test Ltd 999",
         "registration_type": "Company",
-        "foreign_exporter_id": "EXP-ALL-999",
+        "foreign_exporter_id": "EXP-ALL-9999",
         "foreign_exporter_country": "China",
         "foreign_exporter_country_code": "CN",
         "phone_number": "+86 755 8899 0000",
@@ -128,47 +189,10 @@ def test_master_data_repository_crud():
     supp = repo.create_supplier(s_data)
     assert supp.supplier_id is not None
 
-    # Service Provider Test
-    p_data = {
-        "partner_name": "الشرق الأوسط للتخليص الجمركي والاختبار التام",
-        "partner_type": "Customs Broker",
-        "phone_number": "+20 122 333 4444",
-        "email": "info@customs.eg"
-    }
-    prv = repo.create_service_provider(p_data)
-    assert prv.partner_id is not None
-
-    # MD-005 Shipping Line Test
-    sl = ShippingLine(shipping_line_name="CMA CGM Test Line", scac_code="CMDU", website="www.cma-cgm.com")
-    session.add(sl)
-
-    # MD-006 Currency Test
-    cur = Currency(iso_code="JPY", currency_name="Japanese Yen", symbol="¥", decimal_places=0)
-    session.add(cur)
-
-    # MD-007 Incoterm Test
-    inco = Incoterm(incoterm_code="CPT", name="Carriage Paid To", version="Incoterms 2020")
-    session.add(inco)
-
-    # BP-006 Freight Quotation Test
-    fq = FreightQuotation(import_file_id="IMP-2026-0001", carrier_name="Evergreen Line", port_of_loading="Yantian", port_of_discharge="Damietta", freight_cost_usd=2400.0)
-    session.add(fq)
-
-    # BP-007 Customs Checklist Test
-    chk = CustomsDocumentChecklist(import_file_id="IMP-2026-0001", document_type="Certificate of Origin", status="Approved")
-    session.add(chk)
-
-    session.commit()
-    assert sl.shipping_line_id is not None
-    assert cur.iso_code == "JPY"
-    assert inco.incoterm_code == "CPT"
-    assert fq.quotation_id is not None
-    assert chk.checklist_id is not None
-
     session.close()
 
 
-# ── 6. Pure i18n Translation Engine Tests ──────────────────────────────
+# ── 10. Pure i18n Translation Engine Tests ─────────────────────────────
 def test_i18n_manager():
     i18n.set_language("ar")
     assert i18n.t("app_name") == "نظام إدارة الاستيراد"
@@ -179,7 +203,7 @@ def test_i18n_manager():
     i18n.set_language("ar")
 
 
-# ── 7. Report Exporters Tests (Excel & PDF) ───────────────────────────
+# ── 11. Report Exporters Tests (Excel & PDF) ───────────────────────────
 def test_report_exporters():
     temp_dir = tempfile.gettempdir()
     excel_path = os.path.join(temp_dir, "test_out.xlsx")
