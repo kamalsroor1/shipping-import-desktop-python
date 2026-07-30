@@ -45,15 +45,14 @@ jobs:
           Copy-Item -Path ".htaccess" -Destination "deploy_updates\.htaccess"
           Copy-Item -Path "src\assets\app_icon.png" -Destination "deploy_updates\app_icon.png"
 
-      - name: Deploy Updates to Hostinger via FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Deploy Updates to Hostinger via SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.6
         with:
+          username: 'u910151740'
           server: 'shipping.baraa-solutions.com'
-          username: 'u910151740.shipping.baraa-solutions.com'
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /files/public_html/updates/
-          local-dir: ./deploy_updates/
-          port: 21
-          protocol: ftps
-          security: loose
-          timeout: 180000
+          port: 65002
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          local_path: './deploy_updates/*'
+          remote_path: '/home/u910151740/domains/baraa-solutions.com/public_html/shipping/updates'
+          sftp_only: true
+
