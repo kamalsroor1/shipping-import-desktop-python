@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  build-desktop-app:
     runs-on: windows-latest
 
     steps:
@@ -42,8 +42,25 @@ jobs:
           Copy-Item -Path "dist\IMS.exe" -Destination "deploy_updates\ImportManagementSystem.exe"
           Copy-Item -Path "version_example.json" -Destination "deploy_updates\version.json"
           Copy-Item -Path "download_page.html" -Destination "deploy_updates\index.html"
-          Copy-Item -Path ".htaccess" -Destination "deploy_updates\.htaccess"
+          Copy-Item -Path ".htaccess" -Destination "deploy_updates\\.htaccess"
           Copy-Item -Path "src\assets\app_icon.png" -Destination "deploy_updates\app_icon.png"
+
+      - name: Upload Deployment Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-updates
+          path: ./deploy_updates/
+
+  deploy-updates:
+    runs-on: ubuntu-latest
+    needs: build-desktop-app
+
+    steps:
+      - name: Download Deployment Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: deploy-updates
+          path: ./deploy_updates
 
       - name: Deploy Updates to Hostinger via SFTP
         uses: wlixcc/SFTP-Deploy-Action@v1.2.6
@@ -55,4 +72,5 @@ jobs:
           local_path: './deploy_updates/*'
           remote_path: '/home/u910151740/domains/baraa-solutions.com/public_html/shipping/updates'
           sftp_only: true
+
 
